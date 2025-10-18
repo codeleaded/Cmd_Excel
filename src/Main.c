@@ -17,7 +17,12 @@ int main(int argc,const char *argv[]){
     Excel_Set(&e,1,0,"= 3 + 4");
     Excel_Set(&e,2,0,"= $(0,0) + $(1,0)");
 
-    Excel_Script(&e,"./code/Main.vbl");
+    Excel_Script(&e.vbl.ev,"./code/Main.vbl");
+    
+    Variable ret = Excel_Function(&e.vbl.ev,"main",(Variable[]){
+        Variable_Null()
+    });
+    Variable_Free(&ret);
 
     Excel_Free(&e);
 

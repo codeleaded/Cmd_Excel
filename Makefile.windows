@@ -3,7 +3,7 @@
 CC = gcc
 CFLAGS = -O2 -mavx2 -std=gnu17
 INCLUDES = -Isrc
-LDFLAGS = -lm -mwindows -luser32 -lgdi32
+LDFLAGS = -lm
 SRC_DIR = src
 BUILD_DIR = build
 TARGET = $(BUILD_DIR)/Main.exe
@@ -20,7 +20,7 @@ $(TARGET): $(SRCS)
 	$(CC) $(CFLAGS) $(INCLUDES) $(SRCS) -o $(TARGET) $(LDFLAGS)
 
 exe:
-	$(TARGET) ./code/Pong.ll
+	$(TARGET)
 
 clean:
 	if exist "$(BUILD_DIR)" del /Q "$(BUILD_DIR)\*"
