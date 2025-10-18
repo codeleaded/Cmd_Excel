@@ -365,7 +365,7 @@ Token List_Int_Handler_Asu(Scope* s,Token* op,Vector* args){
                     Variable_Free(var);
                     PVector_Remove(members,cn);
                 }else{
-                    printf("[List_Asu]: index %lld out of bounds!\n",cn);
+                    printf("[List_Asu]: index %ld out of bounds!\n",cn);
                     return Token_Null();
                 }
             }
@@ -486,7 +486,7 @@ Token List_Int_Handler_Subs(Scope* s,Token* op,Vector* args){
 
                     Scope_BuildRefVariableRange(s,name,member->typename,s->range+1,member);
                 }else{
-                    printf("[List_Subs]: in list %s index %lld is out of bounds!\n",a_var->name,n2);
+                    printf("[List_Subs]: in list %s index %ld is out of bounds!\n",a_var->name,n2);
                     return Token_Null();
                 }
             }
