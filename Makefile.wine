@@ -3,7 +3,7 @@
 CC = x86_64-w64-mingw32-gcc
 CFLAGS = -O2 -mavx2 -std=gnu17
 INCLUDES = -Isrc
-LDFLAGS = -lm -mwindows -luser32 -lgdi32
+LDFLAGS = -lm
 SRC_DIR = ./src
 BUILD_DIR = ./build
 TARGET = $(BUILD_DIR)/Main.exe
@@ -16,10 +16,10 @@ alldebug:
 	$(CC) -g $(CFLAGS) $(INCLUDES) ./$(SRC_DIR)/Main.c -o ./$(TARGET) $(LDFLAGS) 
 
 debug:
-	WINEPREFIX=~/wine64 WINEARCH=win64 winedbg $(TARGET) ./code/Pong.ll
+	WINEPREFIX=~/wine64 WINEARCH=win64 winedbg $(TARGET)
 
 run: $(TARGET)
-	WINEPREFIX=~/wine64 WINEARCH=win64 wine $(TARGET) ./code/Pong.ll
+	WINEPREFIX=~/wine64 WINEARCH=win64 wine $(TARGET)
 
 clean:
 	rm -f $(BUILD_DIR)/*
