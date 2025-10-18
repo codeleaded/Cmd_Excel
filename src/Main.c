@@ -11,18 +11,20 @@
 
 int main(int argc,const char *argv[]){
     
-    Excel e = Excel_New(10,10);
+    Excel e = Excel_New("./bin",10,10);
 
-    Excel_Set(&e,0,0,"= 1 + 2");
-    Excel_Set(&e,1,0,"= 3 + 4");
-    Excel_Set(&e,2,0,"= $(0,0) + $(1,0)");
+    // Excel_Set(&e,0,0,"= 1 + 2");
+    // Excel_Set(&e,1,0,"= 3 + 4");
+    // Excel_Set(&e,2,0,"= $(0,0) + $(1,0)");
 
-    Excel_Script(&e.vbl.ev,"./code/Main.vbl");
+    // Excel_Script(&e.vbl.ev,"./code/Main.vbl");
     
-    Variable ret = Excel_Function(&e.vbl.ev,"main",(Variable[]){
-        Variable_Null()
-    });
-    Variable_Free(&ret);
+    // Variable ret = Excel_Function(&e.vbl.ev,"main",(Variable[]){
+    //     Variable_Null()
+    // });
+    // Variable_Free(&ret);
+
+    Excel_Print(&e);
 
     Excel_Free(&e);
 
