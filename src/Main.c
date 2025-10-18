@@ -17,8 +17,8 @@ int main(int argc,const char *argv[]){
     Excel_Set(&e,1,0,"2");
 
     Excel_Set(&e,2,0,"= 1 + 2");
-    Excel_Set(&e,3,0,"= 3 + 4");
-    Excel_Set(&e,4,0,"= $(0,0) + $(1,0)");
+    // Excel_Set(&e,3,0,"= 3 + 4");
+    // Excel_Set(&e,4,0,"= $(0,0) + $(1,0)");
 
     // Excel_Script(&e.vbl.ev,"./code/Main.vbl");
     
