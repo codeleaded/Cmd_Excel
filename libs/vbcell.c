@@ -125,9 +125,39 @@ Token VBCell_VBCell_Handler_Ass(Excel* e,Token* op,Vector* args){
 
     printf("ASS: %s = %s\n",a->str,b->str);
 
-    ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
+    ExcelCell* ec = Excel_VBCell_Get(e,a);
 
-    
+    if(CStr_Cmp(ec->type,"int")){
+        if(ec->output) free(ec->output);
+        CStr_Set(&ec->type,"int");
+        ec->output = malloc(sizeof(Number));
+        *(Number*)ec->output = Excel_Int_Get(e,b);
+    }else if(CStr_Cmp(ec->type,"float")){
+        if(ec->output) free(ec->output);
+        CStr_Set(&ec->type,"float");
+        ec->output = malloc(sizeof(Double));
+        *(Double*)ec->output = Excel_Float_Get(e,b);
+    }else if(CStr_Cmp(ec->type,"bool")){
+        if(ec->output) free(ec->output);
+        CStr_Set(&ec->type,"bool");
+        ec->output = malloc(sizeof(Boolean));
+        *(Boolean*)ec->output = Excel_Bool_Get(e,b);
+    }else if(CStr_Cmp(ec->type,"str")){
+        if(ec->output) free(ec->output);
+        CStr_Set(&ec->type,"str");
+        ec->output = CStr_Cpy(Excel_Str_Get(e,b));
+    }else if(CStr_Cmp(ec->type,"func")){
+        if(ec->output) free(ec->output);
+        CStr_Set(&ec->type,"func");
+        ec->output = CStr_Cpy(Excel_Str_Get(e,b));
+    }else{
+        if(ec->output) free(ec->output);
+        CStr_Free(&ec->type);
+        ec->type = NULL;
+
+        ExcelCell* ec_b = Excel_VBCell_Get(e,b);
+        ec->output = CStr_Cpy((CStr)ec_b->output);
+    }
 
     return Token_Cpy(a);
 }
@@ -154,6 +184,7 @@ Token VBCell_Int_Handler_Ass(Excel* e,Token* op,Vector* args){
     ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
 
     if(vbcell_a->output) free(vbcell_a->output);
+    CStr_Set(&vbcell_a->type,"int");
     vbcell_a->output = malloc(sizeof(Number));
     *(Number*)vbcell_a->output = Excel_Int_Get(e,b);
 
