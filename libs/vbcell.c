@@ -56,20 +56,23 @@ Token VBCell_VBCell_Handler_Ass(Excel* e,Token* op,Vector* args){
         }
     }else if(a->tt==TOKEN_STRING){
         Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
-        const Vic2 pos = VBLike_ExtractCoords(&e->vbl,a);
+        const Vic2 pos = VBLike_ExtractCoords(&e->vbl,b);
         
-        if(a_var){
-            Variable_PrepairFor(a_var,sizeof(CStr),"vbcell",VBCell_Destroyer,VBCell_Cpyer);
-            Variable_SetTo(a_var,(CStr[]){ CStr_Format("%d,%d",pos.x,pos.y) });
-        }else{
-            Scope_BuildInitVariableRange(
-                &e->vbl.ev.sc,
-                a->str,
-                "vbcell",
-                e->vbl.ev.sc.range - 1,
-                (CStr[]){ CStr_Format("%d,%d",pos.x,pos.y) }
-            );
-        }
+        if(pos.x>=0 && pos.x<e->countx && pos.y>=0 && pos.y<e->county){
+            if(a_var){
+                Variable_PrepairFor(a_var,sizeof(CStr),"vbcell",VBCell_Destroyer,VBCell_Cpyer);
+                Variable_SetTo(a_var,(CStr[]){ CStr_Format("%d,%d",pos.x,pos.y) });
+            }else{
+                Scope_BuildInitVariableRange(
+                    &e->vbl.ev.sc,
+                    a->str,
+                    "vbcell",
+                    e->vbl.ev.sc.range - 1,
+                    (CStr[]){ CStr_Format("%d,%d",pos.x,pos.y) }
+                );
+            }
+        }else
+            Interpreter_ErrorHandler(&e->vbl.ev,"[VBCell_VBCell_Ass] Cell %d,%d is invalid!\n",pos.x,pos.y);
     }else{
         Interpreter_ErrorHandler(&e->vbl.ev,"[VBCell_VBCell_Ass] Operator %s undefined for: %s and %s!\n",op->str,a->str,b->str);
     }
@@ -80,18 +83,20 @@ Token VBCell_VBCell_Handler_Add(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ADD: %s + %s\n",a->str,b->str);
+    //printf("ADD: %s + %s\n",a->str,b->str);
 
     ExcelCell* ec = Excel_VBCell_Get(e,a);
 
-    if(CStr_Cmp(ec->type,"int")){
-        return Token_Move(TOKEN_NUMBER,I64_Get_D(Excel_Int_Get(e,a) + Excel_Int_Get(e,b)));
-    }else if(CStr_Cmp(ec->type,"float")){
-        return Token_Move(TOKEN_FLOAT,F64_Get_Dc(Excel_Float_Get(e,a) + Excel_Float_Get(e,b)));
-    }else if(CStr_Cmp(ec->type,"str")){
-        return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Concat(Excel_Str_Get(e,a),Excel_Str_Get(e,b)));
-    }else if(!ec->type){
-        return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Concat(Excel_Str_Get(e,a),Excel_Str_Get(e,b)));
+    if(ec){
+        if(CStr_Cmp(ec->type,"int")){
+            return Token_Move(TOKEN_NUMBER,I64_Get_D(Excel_Int_Get(e,a) + Excel_Int_Get(e,b)));
+        }else if(CStr_Cmp(ec->type,"float")){
+            return Token_Move(TOKEN_FLOAT,F64_Get_Dc(Excel_Float_Get(e,a) + Excel_Float_Get(e,b)));
+        }else if(CStr_Cmp(ec->type,"str")){
+            return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Concat(Excel_Str_Get(e,a),Excel_Str_Get(e,b)));
+        }else if(!ec->type){
+            return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Concat(Excel_Str_Get(e,a),Excel_Str_Get(e,b)));
+        }
     }
 
     Interpreter_ErrorHandler(&e->vbl.ev,"[VBCell_VBCell_Add] Operator %s undefined for: %s and %s!\n",op->str,a->str,b->str);
