@@ -186,33 +186,36 @@ Variable VBCell_CellSet(Excel* e,CStr name,Variable* args){
     ExcelCell* ec = Excel_VBCell_Get(e,&tok);
     Token_Free(&tok);
 
-    if(CStr_Cmp(ec->type,"int")){
+    if(CStr_Cmp(c->typename,"int")){
         if(ec->output) free(ec->output);
         CStr_Set(&ec->type,"int");
         ec->output = malloc(sizeof(Number));
         *(Number*)ec->output = Excel_Int_Get_V(e,c);
-    }else if(CStr_Cmp(ec->type,"float")){
+    }else if(CStr_Cmp(c->typename,"float")){
         if(ec->output) free(ec->output);
         CStr_Set(&ec->type,"float");
         ec->output = malloc(sizeof(Double));
         *(Double*)ec->output = Excel_Float_Get_V(e,c);
-    }else if(CStr_Cmp(ec->type,"bool")){
+    }else if(CStr_Cmp(c->typename,"bool")){
         if(ec->output) free(ec->output);
         CStr_Set(&ec->type,"bool");
         ec->output = malloc(sizeof(Boolean));
         *(Boolean*)ec->output = Excel_Bool_Get_V(e,c);
-    }else if(CStr_Cmp(ec->type,"str")){
+    }else if(CStr_Cmp(c->typename,"str")){
         if(ec->output) free(ec->output);
         CStr_Set(&ec->type,"str");
-        ec->output = CStr_Cpy(Excel_Str_Get_V(e,c));
-    }else if(CStr_Cmp(ec->type,"func")){
+        ec->output = malloc(sizeof(CStr));
+        *(CStr*)ec->output = CStr_Cpy(Excel_Str_Get_V(e,c));
+    }else if(CStr_Cmp(c->typename,"func")){
         if(ec->output) free(ec->output);
         CStr_Set(&ec->type,"func");
-        ec->output = CStr_Cpy(Excel_Str_Get_V(e,c));
+        ec->output = malloc(sizeof(CStr));
+        *(CStr*)ec->output = CStr_Cpy(Excel_Func_Get_V(e,c));
     }else{
         if(ec->output) free(ec->output);
         CStr_Free(&ec->type);
         ec->type = NULL;
+        
         ExcelCell* ec_b = Excel_VBCell_Get_V(e,c);
         ec->output = CStr_Cpy((CStr)ec_b->output);
     }
