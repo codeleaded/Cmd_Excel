@@ -163,6 +163,63 @@ Token VBCell_Handler_Cast(Excel* e,Token* op,Vector* args){
     return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Format("$(%d,%d)",pos.x,pos.y));
 }
 
+Variable VBCell_CellGet(Excel* e,CStr name,Variable* args){
+    Variable* a = &args[0];
+    Variable* b = &args[1];
+    
+    return Variable_Make(
+        "OUT",
+        "vbcell",
+        (CStr[]){ CStr_Format("%ld,%ld",*(Number*)a->data,*(Number*)b->data) },
+        sizeof(CStr),
+        0,
+        NULL,
+        NULL
+    );
+}
+Variable VBCell_CellSet(Excel* e,CStr name,Variable* args){
+    Variable* a = &args[0];
+    Variable* b = &args[1];
+    Variable* c = &args[2];
+
+    Token tok = Token_Move(TOKEN_VBLIKE_CELL,CStr_Format("%d,%d",*(Number*)a->data,*(Number*)b->data));
+    ExcelCell* ec = Excel_VBCell_Get(e,&tok);
+    Token_Free(&tok);
+
+    if(CStr_Cmp(ec->type,"int")){
+        if(ec->output) free(ec->output);
+        CStr_Set(&ec->type,"int");
+        ec->output = malloc(sizeof(Number));
+        *(Number*)ec->output = Excel_Int_Get_V(e,c);
+    }else if(CStr_Cmp(ec->type,"float")){
+        if(ec->output) free(ec->output);
+        CStr_Set(&ec->type,"float");
+        ec->output = malloc(sizeof(Double));
+        *(Double*)ec->output = Excel_Float_Get_V(e,c);
+    }else if(CStr_Cmp(ec->type,"bool")){
+        if(ec->output) free(ec->output);
+        CStr_Set(&ec->type,"bool");
+        ec->output = malloc(sizeof(Boolean));
+        *(Boolean*)ec->output = Excel_Bool_Get_V(e,c);
+    }else if(CStr_Cmp(ec->type,"str")){
+        if(ec->output) free(ec->output);
+        CStr_Set(&ec->type,"str");
+        ec->output = CStr_Cpy(Excel_Str_Get_V(e,c));
+    }else if(CStr_Cmp(ec->type,"func")){
+        if(ec->output) free(ec->output);
+        CStr_Set(&ec->type,"func");
+        ec->output = CStr_Cpy(Excel_Str_Get_V(e,c));
+    }else{
+        if(ec->output) free(ec->output);
+        CStr_Free(&ec->type);
+        ec->type = NULL;
+        ExcelCell* ec_b = Excel_VBCell_Get_V(e,c);
+        ec->output = CStr_Cpy((CStr)ec_b->output);
+    }
+    
+    return Variable_Null();
+}
+
 void Ex_Packer(ExternFunctionMap* Extern_Functions,Vector* funcs,Scope* s){//Vector<CStr>
     TypeMap_PushContained(&s->types,funcs,
         Type_New("vbcell",sizeof(CStr),OperatorInterationMap_Make((OperatorInterater[]){
@@ -188,4 +245,18 @@ void Ex_Packer(ExternFunctionMap* Extern_Functions,Vector* funcs,Scope* s){//Vec
             OPERATORINTERATER_END
         }),NULL,NULL)
     );
+    ExternFunctionMap_PushContained_C(Extern_Functions,funcs,(ExternFunction[]){
+        ExternFunction_New("get","vbcell",(Member[]){ 
+            Member_New("int","x"),
+            Member_New("int","y"),
+            MEMBER_END
+        },(void*)VBCell_CellGet),
+        ExternFunction_New("set",NULL,(Member[]){ 
+            Member_New("int","x"),
+            Member_New("int","y"),
+            Member_New(NULL,"content"),
+            MEMBER_END
+        },(void*)VBCell_CellSet),
+        ExternFunction_Null()
+    });
 }
