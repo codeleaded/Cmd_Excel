@@ -167,11 +167,20 @@ Token VBCell_VBCell_Handler_Add(Excel* e,Token* op,Vector* args){
 
     printf("ADD: %s + %s\n",a->str,b->str);
 
-    ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
+    ExcelCell* ec = Excel_VBCell_Get(e,a);
 
+    if(CStr_Cmp(ec->type,"int")){
+        return Token_Move(TOKEN_NUMBER,I64_Get_D(Excel_Int_Get(e,a) + Excel_Int_Get(e,b)));
+    }else if(CStr_Cmp(ec->type,"float")){
+        return Token_Move(TOKEN_FLOAT,F64_Get_Dc(Excel_Float_Get(e,a) + Excel_Float_Get(e,b)));
+    }else if(CStr_Cmp(ec->type,"str")){
+        return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Concat(Excel_Str_Get(e,a),Excel_Str_Get(e,b)));
+    }else if(!ec->type){
+        return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Concat(Excel_Str_Get(e,a),Excel_Str_Get(e,b)));
+    }
 
-
-    return Token_Move(TOKEN_NONE,NULL);
+    Interpreter_ErrorHandler(&e->vbl.ev,"[VBCell_VBCell_Add] Operator %s undefined for: %s and %s!\n",op->str,a->str,b->str);
+    return Token_Null();
 }
 
 Token VBCell_Int_Handler_Ass(Excel* e,Token* op,Vector* args){
@@ -188,7 +197,7 @@ Token VBCell_Int_Handler_Ass(Excel* e,Token* op,Vector* args){
     vbcell_a->output = malloc(sizeof(Number));
     *(Number*)vbcell_a->output = Excel_Int_Get(e,b);
 
-    return Token_Move(TOKEN_NONE,NULL);
+    return Token_Cpy(a);
 }
 Token VBCell_Int_Handler_Add(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
@@ -198,6 +207,33 @@ Token VBCell_Int_Handler_Add(Excel* e,Token* op,Vector* args){
     
     return Token_Move(TOKEN_NUMBER,I64_Get_D(Excel_Int_Get(e,a) + Excel_Int_Get(e,b)));
 }
+
+Token VBCell_Str_Handler_Ass(Excel* e,Token* op,Vector* args){
+    Token* a = (Token*)Vector_Get(args,0);
+    Token* b = (Token*)Vector_Get(args,1);
+
+    printf("ASS: %s = %s\n",a->str,b->str);
+
+    const Vic2 pos = VBLike_ExtractCoords(a->str);
+    ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
+
+    if(vbcell_a->output) free(vbcell_a->output);
+    CStr_Set(&vbcell_a->type,"str");
+    
+    vbcell_a->output = malloc(sizeof(CStr));
+    *(CStr*)vbcell_a->output = CStr_Cpy(Excel_Str_Get(e,b));
+
+    return Token_Cpy(a);
+}
+Token VBCell_Str_Handler_Add(Excel* e,Token* op,Vector* args){
+    Token* a = (Token*)Vector_Get(args,0);
+    Token* b = (Token*)Vector_Get(args,1);
+
+    printf("ADD: %s + %s\n",a->str,b->str);
+    
+    return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Concat(Excel_Str_Get(e,a),Excel_Str_Get(e,b)));
+}
+
 
 Token VBCell_Handler_Cast(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
@@ -223,6 +259,11 @@ void Ex_Packer(ExternFunctionMap* Extern_Functions,Vector* funcs,Scope* s){//Vec
             OperatorInterater_Make((CStr[]){ "int",NULL },OperatorDefineMap_Make((OperatorDefiner[]){
                 OperatorDefiner_New(TOKEN_VBLIKE_ASS,(Token(*)(void*,Token*,Vector*))VBCell_Int_Handler_Ass),
                 OperatorDefiner_New(TOKEN_VBLIKE_ADD,(Token(*)(void*,Token*,Vector*))VBCell_Int_Handler_Add),
+                OPERATORDEFINER_END
+            })),
+            OperatorInterater_Make((CStr[]){ "str",NULL },OperatorDefineMap_Make((OperatorDefiner[]){
+                OperatorDefiner_New(TOKEN_VBLIKE_ASS,(Token(*)(void*,Token*,Vector*))VBCell_Str_Handler_Ass),
+                OperatorDefiner_New(TOKEN_VBLIKE_ADD,(Token(*)(void*,Token*,Vector*))VBCell_Str_Handler_Add),
                 OPERATORDEFINER_END
             })),
             OPERATORINTERATER_END
