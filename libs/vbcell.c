@@ -83,7 +83,7 @@ Token VBCell_VBCell_Handler_Add(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    //printf("ADD: %s + %s\n",a->str,b->str);
+    printf("ADD: %s + %s\n",a->str,b->str);
 
     ExcelCell* ec = Excel_VBCell_Get(e,a);
 
