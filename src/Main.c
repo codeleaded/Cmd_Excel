@@ -12,6 +12,7 @@
 int main(int argc,const char *argv[]){
     
     Excel e = Excel_New("./bin",10,10);
+    //Excel e = Excel_Load("./bin","./data/SpreadSheet0.vblss");
 
     // Excel_Set(&e,0,0,"=1");
     // Excel_Set(&e,1,0,"=2");
@@ -29,6 +30,8 @@ int main(int argc,const char *argv[]){
 
     Excel_Print(&e);
     Excel_Print_O(&e);
+
+    //Excel_Save(&e,"./data/SpreadSheet0.vblss");
 
     Excel_Free(&e);
 
