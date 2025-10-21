@@ -159,6 +159,7 @@ Token VBCell_Handler_Cast(Excel* e,Token* op,Vector* args){
 
     //ExcelCell* ec = Excel_VBCell_Get(e,a);
     const Vic2 pos = VBLike_ExtractCoords(&e->vbl,a);
+    
     return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Format("$(%d,%d)",pos.x,pos.y));
 }
 
