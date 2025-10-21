@@ -21,14 +21,15 @@ int main(int argc,const char *argv[]){
     // Excel_Set(&e,3,0,"=3+4");
     // Excel_Set(&e,4,0,"=$(0,0)+$(1,0)+$(2,0)+$(3,0)");
 
-    //Excel_Script(&e.vbl.ev,"./code/Main.vbl");
+    // Excel_Script(&e.vbl.ev,"./code/Main.vbl");
     
-    //Variable ret = Excel_Function(&e.vbl.ev,"main",(Variable[]){
+    // Variable ret = Excel_Function(&e.vbl.ev,"main",(Variable[]){
     //    Variable_Null()
-    //});
-    //Variable_Free(&ret);
+    // });
+    // Variable_Free(&ret);
 
     Excel_Print(&e);
+    Excel_Print_T(&e);
     Excel_Print_O(&e);
 
     //Excel_Save(&e,"./data/SpreadSheet0.vblss");
