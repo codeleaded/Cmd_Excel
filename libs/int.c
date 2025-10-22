@@ -29,7 +29,6 @@ Token Int_Any_Handler_Ass(Excel* e,Token* op,Vector* args){
     }
 
     Number res = n2;
-
     char* resstr = Number_Get(res);
     return Token_Move(TOKEN_NUMBER,resstr);
 }

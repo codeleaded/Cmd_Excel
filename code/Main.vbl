@@ -6,11 +6,7 @@ end
 
 function main()
     
-    i = 0
-    while i<5
-        $(i,i) = i + i
-        i = i + 1
-    end
+    $(0,0) = math::sin(3.1415 * 0.5)
     
     return
 end

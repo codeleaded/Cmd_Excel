@@ -1,26 +1,26 @@
 #include "/home/codeleaded/System/Static/Library/AlxCallStack.h"
 #include "/home/codeleaded/System/Static/Library/AlxExternFunctions.h"
-#include "/home/codeleaded/System/Static/Library/LuaLikeDefines.h"
+#include "/home/codeleaded/System/Static/Library/Excel.h"
 
-Variable io_input(Scope* sc,CStr name,Variable* args){
+Variable io_input(Excel* e,CStr name,Variable* args){
     char buffer[1024];
     char* back = fgets(buffer,1024,stdin);
     Variable ret = Variable_Make(
         "INPUT","str",(CStr[]){ CStr_Cpy(buffer) },
-        sizeof(CStr),sc->range-1,
-        Scope_DestroyerOfType(sc,"str"),
-        Scope_CpyerOfType(sc,"str")
+        sizeof(CStr),e->vbl.ev.sc.range-1,
+        Scope_DestroyerOfType(&e->vbl.ev.sc,"str"),
+        Scope_CpyerOfType(&e->vbl.ev.sc,"str")
     );
     return ret;
 }
-Variable io_print(Scope* sc,CStr name,Variable* args){
+Variable io_print(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     
     printf("%s",*(CStr*)a->data);
     Variable ret = Variable_Null();
     return ret;
 }
-Variable io_error(Scope* sc,CStr name,Variable* args){
+Variable io_error(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     
     printf("\033[31m%s\033[37m",*(CStr*)a->data);
