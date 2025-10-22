@@ -1,8 +1,8 @@
 #include "/home/codeleaded/System/Static/Library/AlxCallStack.h"
 #include "/home/codeleaded/System/Static/Library/AlxExternFunctions.h"
-#include "/home/codeleaded/System/Static/Library/LuaLikeDefines.h"
+#include "/home/codeleaded/System/Static/Library/Excel.h"
 
-Variable math_min(Scope* sc,CStr name,Variable* args){
+Variable math_min(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     Variable* b = &args[1];
     
@@ -10,7 +10,7 @@ Variable math_min(Scope* sc,CStr name,Variable* args){
     Variable ret = Variable_Make("OUT","int",(Number[]){ out },sizeof(Number),0,NULL,NULL);
     return ret;
 }
-Variable math_max(Scope* sc,CStr name,Variable* args){
+Variable math_max(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     Variable* b = &args[1];
     
@@ -19,26 +19,26 @@ Variable math_max(Scope* sc,CStr name,Variable* args){
     return ret;
 }
 
-Variable math_sin(Scope* sc,CStr name,Variable* args){
+Variable math_sin(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     Double out = sin(*(Double*)Variable_Data(a));
     Variable ret = Variable_Make("OUT","float",(Double[]){ out },sizeof(Double),0,NULL,NULL);
     return ret;
 }
-Variable math_cos(Scope* sc,CStr name,Variable* args){
+Variable math_cos(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     Double out = cos(*(Double*)Variable_Data(a));
     Variable ret = Variable_Make("OUT","float",(Double[]){ out },sizeof(Double),0,NULL,NULL);
     return ret;
 }
-Variable math_tan(Scope* sc,CStr name,Variable* args){
+Variable math_tan(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     Double out = tan(*(Double*)Variable_Data(a));
     Variable ret = Variable_Make("OUT","float",(Double[]){ out },sizeof(Double),0,NULL,NULL);
     return ret;
 }
 
-Variable math_pow(Scope* sc,CStr name,Variable* args){
+Variable math_pow(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     Variable* b = &args[1];
     Double out = pow(*(Double*)Variable_Data(a),*(Double*)Variable_Data(b));
@@ -46,32 +46,32 @@ Variable math_pow(Scope* sc,CStr name,Variable* args){
     return ret;
 }
 
-Variable math_parseInt(Scope* sc,CStr name,Variable* args){
+Variable math_parseInt(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     
     Number out = Number_Parse(*(CStr*)a->data);
     Variable ret = Variable_Make("OUT","int",(Number[]){ out },sizeof(Number),0,NULL,NULL);
     return ret;
 }
-Variable math_parseFloat(Scope* sc,CStr name,Variable* args){
+Variable math_parseFloat(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     
     Double out = Double_Parse(*(CStr*)a->data,1);
     Variable ret = Variable_Make("OUT","float",(Double[]){ out },sizeof(Double),0,NULL,NULL);
     return ret;
 }
-Variable math_getInt(Scope* sc,CStr name,Variable* args){
+Variable math_getInt(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     
     CStr out = Number_Get(*(Number*)a->data);
-    Variable ret = Variable_Make("OUT","str",(CStr[]){ out },sizeof(CStr),0,Scope_DestroyerOfType(sc,"str"),Scope_CpyerOfType(sc,"str"));
+    Variable ret = Variable_Make("OUT","str",(CStr[]){ out },sizeof(CStr),0,Scope_DestroyerOfType(&e->vbl.ev.sc,"str"),Scope_CpyerOfType(&e->vbl.ev.sc,"str"));
     return ret;
 }
-Variable math_getFloat(Scope* sc,CStr name,Variable* args){
+Variable math_getFloat(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     
     CStr out = Double_Get(*(Double*)a->data,8);
-    Variable ret = Variable_Make("OUT","str",(CStr[]){ out },sizeof(CStr),0,Scope_DestroyerOfType(sc,"str"),Scope_CpyerOfType(sc,"str"));
+    Variable ret = Variable_Make("OUT","str",(CStr[]){ out },sizeof(CStr),0,Scope_DestroyerOfType(&e->vbl.ev.sc,"str"),Scope_CpyerOfType(&e->vbl.ev.sc,"str"));
     return ret;
 }
 

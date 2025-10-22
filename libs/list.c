@@ -1,12 +1,11 @@
 #include "/home/codeleaded/System/Static/Library/AlxCallStack.h"
 #include "/home/codeleaded/System/Static/Library/AlxExternFunctions.h"
-#include "/home/codeleaded/System/Static/Library/LuaLikeDefines.h"
-//#include "/home/codeleaded/Hecke/C/Cmd_Scripter/src/LuaLike.h"
+#include "/home/codeleaded/System/Static/Library/Excel.h"
 
-Number Implementation_IntOf(Scope* s,Token* a){
+Number Implementation_IntOf(Excel* e,Token* a){
     Number n = NUMBER_PARSE_ERROR;
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             n = *(Number*)Variable_Data(a_var);
         }else{
@@ -17,11 +16,11 @@ Number Implementation_IntOf(Scope* s,Token* a){
     }
     return n;
 }
-Boolean Implementation_BooleanOf(Scope* s,Token* a){
+Boolean Implementation_BooleanOf(Excel* e,Token* a){
     Boolean n = 0;
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             n = *(Boolean*)Variable_Data(a_var);
         }else{
@@ -32,11 +31,11 @@ Boolean Implementation_BooleanOf(Scope* s,Token* a){
     }
     return n;
 }
-Double Implementation_FloatOf(Scope* s,Token* a){
+Double Implementation_FloatOf(Excel* e,Token* a){
     Double n = DOUBLE_PARSE_ERROR;
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             n = *(Double*)Variable_Data(a_var);
         }else{
@@ -47,11 +46,11 @@ Double Implementation_FloatOf(Scope* s,Token* a){
     }
     return n;
 }
-CStr Implementation_StrOf(Scope* s,Token* a){
+CStr Implementation_StrOf(Excel* e,Token* a){
     CStr n = NULL;
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             n = *(CStr*)Variable_Data(a_var);
         }else{
@@ -77,7 +76,7 @@ void List_Cpyer(Variable* src,Variable* dst){
     *dst_str = VariableMap_Cpy(src_str);
 }
 
-Token List_List_Handler_Ass(Scope* s,Token* op,Vector* args){
+Token List_List_Handler_Ass(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
@@ -85,7 +84,7 @@ Token List_List_Handler_Ass(Scope* s,Token* op,Vector* args){
 
     Variable* b_var;
     if(b->tt==TOKEN_STRING){
-        b_var = Scope_FindVariable(s,b->str);
+        b_var = Scope_FindVariable(&e->vbl.ev.sc,b->str);
         if(!b_var){
             printf("[List_Ass]: 1. Arg: Variable %s doesn't exist!\n",a->str);
             return Token_Null();
@@ -96,10 +95,10 @@ Token List_List_Handler_Ass(Scope* s,Token* op,Vector* args){
     }
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(!a_var){
-            Scope_BuildVariableRange(s,a->str,"list",s->range-1);
-            a_var = Scope_FindVariable(s,a->str);
+            Scope_BuildVariableRange(&e->vbl.ev.sc,a->str,"list",e->vbl.ev.sc.range-1);
+            a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
             if(a_var->data) free(a_var->data);
             a_var->data = NULL;
         }
@@ -113,16 +112,16 @@ Token List_List_Handler_Ass(Scope* s,Token* op,Vector* args){
     return Token_Null();
 }
 
-Token List_Int_Handler_Asd(Scope* s,Token* op,Vector* args){
+Token List_Int_Handler_Asd(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("ASD: %s += %s\n",a->str,b->str);
 
-    Number cn = Implementation_IntOf(s,b);
+    Number cn = Excel_Int_Get(e,b);
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Acs]: 1. Arg: %s is not a list type!\n",a->str);
@@ -145,16 +144,16 @@ Token List_Int_Handler_Asd(Scope* s,Token* op,Vector* args){
 
     return Token_Null();
 }
-Token List_Str_Handler_Asd(Scope* s,Token* op,Vector* args){
+Token List_Str_Handler_Asd(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("ASD: %s += %s\n",a->str,b->str);
 
-    CStr cs = Implementation_StrOf(s,b);
+    CStr cs = Excel_Str_Get(e,b);
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Acs]: 1. Arg: %s is not a list type!\n",a->str);
@@ -163,7 +162,7 @@ Token List_Str_Handler_Asd(Scope* s,Token* op,Vector* args){
                 VariableMap* members = Variable_Data(a_var);
                 VariableMap_PPush(members,(Variable[]){ 
                     Variable_Make("NL","str",(CStr[]){ CStr_Cpy(cs) },
-                    sizeof(CStr),-1,Scope_DestroyerOfType(s,"str"),Scope_CpyerOfType(s,"str"))
+                    sizeof(CStr),-1,Scope_DestroyerOfType(&e->vbl.ev.sc,"str"),Scope_CpyerOfType(&e->vbl.ev.sc,"str"))
                 });
             }else{
                 printf("[List_Asd]: 2. Arg: %s is not a str!\n",b->str);
@@ -180,16 +179,16 @@ Token List_Str_Handler_Asd(Scope* s,Token* op,Vector* args){
 
     return Token_Null();
 }
-Token List_Boolean_Handler_Asd(Scope* s,Token* op,Vector* args){
+Token List_Boolean_Handler_Asd(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("ASD: %s += %s\n",a->str,b->str);
 
-    Boolean cb = Implementation_BooleanOf(s,b);
+    Boolean cb = Excel_Bool_Get(e,b);
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Acs]: 1. Arg: %s is not a list type!\n",a->str);
@@ -212,16 +211,16 @@ Token List_Boolean_Handler_Asd(Scope* s,Token* op,Vector* args){
 
     return Token_Null();
 }
-Token List_Float_Handler_Asd(Scope* s,Token* op,Vector* args){
+Token List_Float_Handler_Asd(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("ASD: %s += %s\n",a->str,b->str);
 
-    Double cf = Implementation_FloatOf(s,b);
+    Double cf = Excel_Float_Get(e,b);
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Acs]: 1. Arg: %s is not a list type!\n",a->str);
@@ -244,29 +243,29 @@ Token List_Float_Handler_Asd(Scope* s,Token* op,Vector* args){
 
     return Token_Null();
 }
-Token List_Obj_Handler_Asd(Scope* s,Token* op,Vector* args){
+Token List_Obj_Handler_Asd(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("ASD: %s += %s\n",a->str,b->str);
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Acs]: 1. Arg: %s is not a list type!\n",a->str);
                 return Token_Null();
             }else if(b->tt==TOKEN_STRING){
                 VariableMap* members = Variable_Data(a_var);
-                Variable* b_var = Scope_FindVariable(s,b->str);
+                Variable* b_var = Scope_FindVariable(&e->vbl.ev.sc,b->str);
                 if(b_var){
                     if(!Variable_Data(b_var)){
                         printf("[List_Asd]: 2. Arg: %s is not inited!\n",b->str);
                         return Token_Null();
                     }else if(CStr_Cmp(b_var->typename,"obj")){
-                        void (*Cpyer)(Variable*,Variable*) = Scope_CpyerOfType(s,b_var->typename);
+                        void (*Cpyer)(Variable*,Variable*) = Scope_CpyerOfType(&e->vbl.ev.sc,b_var->typename);
                         
-                        Variable var = Variable_Make("NL",b_var->typename,NULL,sizeof(CStr),-1,Scope_DestroyerOfType(s,b_var->typename),Scope_CpyerOfType(s,b_var->typename));
+                        Variable var = Variable_Make("NL",b_var->typename,NULL,sizeof(CStr),-1,Scope_DestroyerOfType(&e->vbl.ev.sc,b_var->typename),Scope_CpyerOfType(&e->vbl.ev.sc,b_var->typename));
                         Cpyer(b_var,&var);
 
                         VariableMap_PPush(members,&var);
@@ -293,29 +292,29 @@ Token List_Obj_Handler_Asd(Scope* s,Token* op,Vector* args){
 
     return Token_Null();
 }
-Token List_List_Handler_Asd(Scope* s,Token* op,Vector* args){
+Token List_List_Handler_Asd(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("ASD: %s += %s\n",a->str,b->str);
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Acs]: 1. Arg: %s is not a list type!\n",a->str);
                 return Token_Null();
             }else if(b->tt==TOKEN_STRING){
                 VariableMap* members = Variable_Data(a_var);
-                Variable* b_var = Scope_FindVariable(s,b->str);
+                Variable* b_var = Scope_FindVariable(&e->vbl.ev.sc,b->str);
                 if(b_var){
                     if(!Variable_Data(b_var)){
                         printf("[List_Asd]: 2. Arg: %s is not inited!\n",b->str);
                         return Token_Null();
                     }else if(CStr_Cmp(b_var->typename,"list")){
-                        void (*Cpyer)(Variable*,Variable*) = Scope_CpyerOfType(s,b_var->typename);
+                        void (*Cpyer)(Variable*,Variable*) = Scope_CpyerOfType(&e->vbl.ev.sc,b_var->typename);
                         
-                        Variable var = Variable_Make("NL",b_var->typename,NULL,sizeof(CStr),-1,Scope_DestroyerOfType(s,b_var->typename),Scope_CpyerOfType(s,b_var->typename));
+                        Variable var = Variable_Make("NL",b_var->typename,NULL,sizeof(CStr),-1,Scope_DestroyerOfType(&e->vbl.ev.sc,b_var->typename),Scope_CpyerOfType(&e->vbl.ev.sc,b_var->typename));
                         Cpyer(b_var,&var);
 
                         VariableMap_PPush(members,&var);
@@ -343,17 +342,17 @@ Token List_List_Handler_Asd(Scope* s,Token* op,Vector* args){
     return Token_Null();
 }
 
-Token List_Int_Handler_Asu(Scope* s,Token* op,Vector* args){
+Token List_Int_Handler_Asu(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("ASU: %s -= %s\n",a->str,b->str);
 
-    Number cn = Implementation_IntOf(s,b);
-    CStr cs = Implementation_StrOf(s,b);
+    Number cn = Excel_Int_Get(e,b);
+    CStr cs = Excel_Str_Get(e,b);
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Acs]: 1. Arg: %s is not a list type!\n",a->str);
@@ -380,16 +379,16 @@ Token List_Int_Handler_Asu(Scope* s,Token* op,Vector* args){
 
     return Token_Null();
 }
-Token List_Str_Handler_Asu(Scope* s,Token* op,Vector* args){
+Token List_Str_Handler_Asu(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("ASU: %s -= %s\n",a->str,b->str);
 
-    CStr cs = Implementation_StrOf(s,b);
+    CStr cs = Excel_Str_Get(e,b);
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Acs]: 1. Arg: %s is not a list type!\n",a->str);
@@ -413,16 +412,16 @@ Token List_Str_Handler_Asu(Scope* s,Token* op,Vector* args){
     return Token_Null();
 }
 
-Token List_Str_Handler_Asm(Scope* s,Token* op,Vector* args){
+Token List_Str_Handler_Asm(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("ASM: %s *= %s\n",a->str,b->str);
 
-    CStr cs = Implementation_StrOf(s,b);
+    CStr cs = Excel_Str_Get(e,b);
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Acs]: 1. Arg: %s is not a list type!\n",a->str);
@@ -431,7 +430,7 @@ Token List_Str_Handler_Asm(Scope* s,Token* op,Vector* args){
                 VariableMap* members = Variable_Data(a_var);
                 VariableMap_PPush(members,(Variable[]){ 
                     Variable_Make(cs,"str",(CStr[]){ "" },
-                    sizeof(CStr),-1,Scope_DestroyerOfType(s,"str"),Scope_CpyerOfType(s,"str"))
+                    sizeof(CStr),-1,Scope_DestroyerOfType(&e->vbl.ev.sc,"str"),Scope_CpyerOfType(&e->vbl.ev.sc,"str"))
                 });
             }else{
                 printf("[List_Asd]: 2. Arg: %s is not a str!\n",b->str);
@@ -449,17 +448,17 @@ Token List_Str_Handler_Asm(Scope* s,Token* op,Vector* args){
     return Token_Null();
 }
 
-Token List_Int_Handler_Subs(Scope* s,Token* op,Vector* args){
+Token List_Int_Handler_Subs(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("SUBS: %s[%s]\n",a->str,b->str);
 
-    Number n2 = Implementation_IntOf(s,b);
+    Number n2 = Excel_Int_Get(e,b);
     
     CStr name = NULL;
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Subs]: 1. Arg: %s is not a list type!\n",a->str);
@@ -471,7 +470,7 @@ Token List_Int_Handler_Subs(Scope* s,Token* op,Vector* args){
 
                     String strbuilder = String_Make(".LISTSUBS");
                 
-                    Variable* temp = Scope_FindVariableLike(s,".LISTSUBS*",'*');
+                    Variable* temp = Scope_FindVariableLike(&e->vbl.ev.sc,".LISTSUBS*",'*');
 
                     if(temp){
                         CStr retnumberstr = temp->name + 9;// CStr_Size(".LISTSUBS") -> 9
@@ -484,7 +483,7 @@ Token List_Int_Handler_Subs(Scope* s,Token* op,Vector* args){
                         name = CStr_Cpy(".LISTSUBS0");
                     }
 
-                    Scope_BuildRefVariableRange(s,name,member->typename,s->range+1,member);
+                    Scope_BuildRefVariableRange(&e->vbl.ev.sc,name,member->typename,e->vbl.ev.sc.range+1,member);
                 }else{
                     printf("[List_Subs]: in list %s index %ld is out of bounds!\n",a_var->name,n2);
                     return Token_Null();
@@ -501,17 +500,17 @@ Token List_Int_Handler_Subs(Scope* s,Token* op,Vector* args){
 
     return Token_Move(TOKEN_STRING,name);
 }
-Token List_Str_Handler_Subs(Scope* s,Token* op,Vector* args){
+Token List_Str_Handler_Subs(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
     printf("SUBS: %s[%s]\n",a->str,b->str);
 
-    CStr n2 = Implementation_StrOf(s,b);
+    CStr n2 = Excel_Str_Get(e,b);
     
     CStr name = NULL;
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var) || !CStr_Cmp(a_var->typename,"list")){
                 printf("[List_Subs]: 1. Arg: %s is not a list type!\n",a->str);
@@ -522,7 +521,7 @@ Token List_Str_Handler_Subs(Scope* s,Token* op,Vector* args){
                 if(member){
                     String strbuilder = String_Make(".LISTSUBS");
                 
-                    Variable* temp = Scope_FindVariableLike(s,".LISTSUBS*",'*');
+                    Variable* temp = Scope_FindVariableLike(&e->vbl.ev.sc,".LISTSUBS*",'*');
 
                     if(temp){
                         CStr retnumberstr = temp->name + 9;// CStr_Size(".LISTSUBS") -> 9
@@ -535,7 +534,7 @@ Token List_Str_Handler_Subs(Scope* s,Token* op,Vector* args){
                         name = CStr_Cpy(".LISTSUBS0");
                     }
 
-                    Scope_BuildRefVariableRange(s,name,member->typename,s->range+1,member);
+                    Scope_BuildRefVariableRange(&e->vbl.ev.sc,name,member->typename,e->vbl.ev.sc.range+1,member);
                 }else{
                     printf("[List_Subs]: in list %s field \"%s\" doesn't exist!\n",a_var->name,n2);
                     return Token_Null();
@@ -552,14 +551,14 @@ Token List_Str_Handler_Subs(Scope* s,Token* op,Vector* args){
 
     return Token_Move(TOKEN_STRING,name);
 }
-Token List_Handler_Cast(Scope* s,Token* op,Vector* args){
+Token List_Handler_Cast(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
 
     //printf("CAST: %s\n",a->str);
 
     Variable* a_var;
     if(a->tt==TOKEN_STRING){
-        a_var = Scope_FindVariable(s,a->str);
+        a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(!a_var){
             printf("[List_Ass]: 1. Arg: Variable %s doesn't exist!\n",a->str);
             return Token_Null();
@@ -584,7 +583,7 @@ Token List_Handler_Cast(Scope* s,Token* op,Vector* args){
         
         String_Append(&builder," = ");
 
-        CStr content = Scope_VariableContentStr(s,v);
+        CStr content = Scope_VariableContentStr(&e->vbl.ev.sc,v);
         if(content){
             String_Append(&builder,content);
             CStr_Free(&content);
@@ -599,12 +598,12 @@ Token List_Handler_Cast(Scope* s,Token* op,Vector* args){
     String_Free(&builder);
     return Token_Move(TOKEN_CONSTSTRING_DOUBLE,resstr);
 }
-Token List_Handler_Destroy(Scope* s,Token* op,Vector* args){
+Token List_Handler_Destroy(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
 
     printf("DESTROY: %s\n",a->str);
 
-    Variable* a_var = Scope_FindVariable(s,a->str);
+    Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
     if(a_var){
         a_var->destroy(a_var);
     }
@@ -612,12 +611,12 @@ Token List_Handler_Destroy(Scope* s,Token* op,Vector* args){
     return Token_Null();
 }
 
-Variable List_Make(Scope* sc,CStr name,Variable* args){
+Variable List_Make(Excel* e,CStr name,Variable* args){
     Variable ret = Variable_Make(
         "Listtype","list",(VariableMap[]){ VariableMap_New() },
-        sizeof(VariableMap),sc->range-1,
-        Scope_DestroyerOfType(sc,"list"),
-        Scope_CpyerOfType(sc,"list")
+        sizeof(VariableMap),e->vbl.ev.sc.range-1,
+        Scope_DestroyerOfType(&e->vbl.ev.sc,"list"),
+        Scope_CpyerOfType(&e->vbl.ev.sc,"list")
     );
     return ret;
 }
@@ -632,33 +631,33 @@ void Ex_Packer(ExternFunctionMap* Extern_Functions,Vector* funcs,Scope* s){//Vec
                 OPERATORDEFINER_END
             })),
             OperatorInterater_Make((CStr[]){ "list",NULL },OperatorDefineMap_Make((OperatorDefiner[]){
-                OperatorDefiner_New(TOKEN_LUALIKE_ASS,(Token(*)(void*,Token*,Vector*))List_List_Handler_Ass),
-                OperatorDefiner_New(TOKEN_LUALIKE_ASD,(Token(*)(void*,Token*,Vector*))List_List_Handler_Asd),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASS,(Token(*)(void*,Token*,Vector*))List_List_Handler_Ass),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASD,(Token(*)(void*,Token*,Vector*))List_List_Handler_Asd),
                 OPERATORDEFINER_END
             })),
             OperatorInterater_Make((CStr[]){ "int",NULL },OperatorDefineMap_Make((OperatorDefiner[]){
-                OperatorDefiner_New(TOKEN_LUALIKE_SUBS,(Token(*)(void*,Token*,Vector*))List_Int_Handler_Subs),
-                OperatorDefiner_New(TOKEN_LUALIKE_ASD,(Token(*)(void*,Token*,Vector*))List_Int_Handler_Asd),
-                OperatorDefiner_New(TOKEN_LUALIKE_ASU,(Token(*)(void*,Token*,Vector*))List_Int_Handler_Asu),
+                OperatorDefiner_New(TOKEN_VBLIKE_SUBS,(Token(*)(void*,Token*,Vector*))List_Int_Handler_Subs),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASD,(Token(*)(void*,Token*,Vector*))List_Int_Handler_Asd),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASU,(Token(*)(void*,Token*,Vector*))List_Int_Handler_Asu),
                 OPERATORDEFINER_END
             })),
             OperatorInterater_Make((CStr[]){ "str",NULL },OperatorDefineMap_Make((OperatorDefiner[]){
-                OperatorDefiner_New(TOKEN_LUALIKE_SUBS,(Token(*)(void*,Token*,Vector*))List_Str_Handler_Subs),
-                OperatorDefiner_New(TOKEN_LUALIKE_ASD,(Token(*)(void*,Token*,Vector*))List_Str_Handler_Asd),
-                OperatorDefiner_New(TOKEN_LUALIKE_ASU,(Token(*)(void*,Token*,Vector*))List_Str_Handler_Asu),
-                OperatorDefiner_New(TOKEN_LUALIKE_ASM,(Token(*)(void*,Token*,Vector*))List_Str_Handler_Asm),
+                OperatorDefiner_New(TOKEN_VBLIKE_SUBS,(Token(*)(void*,Token*,Vector*))List_Str_Handler_Subs),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASD,(Token(*)(void*,Token*,Vector*))List_Str_Handler_Asd),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASU,(Token(*)(void*,Token*,Vector*))List_Str_Handler_Asu),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASM,(Token(*)(void*,Token*,Vector*))List_Str_Handler_Asm),
                 OPERATORDEFINER_END
             })),
             OperatorInterater_Make((CStr[]){ "Boolean",NULL },OperatorDefineMap_Make((OperatorDefiner[]){
-                OperatorDefiner_New(TOKEN_LUALIKE_ASD,(Token(*)(void*,Token*,Vector*))List_Boolean_Handler_Asd),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASD,(Token(*)(void*,Token*,Vector*))List_Boolean_Handler_Asd),
                 OPERATORDEFINER_END
             })),
             OperatorInterater_Make((CStr[]){ "float",NULL },OperatorDefineMap_Make((OperatorDefiner[]){
-                OperatorDefiner_New(TOKEN_LUALIKE_ASD,(Token(*)(void*,Token*,Vector*))List_Float_Handler_Asd),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASD,(Token(*)(void*,Token*,Vector*))List_Float_Handler_Asd),
                 OPERATORDEFINER_END
             })),
             OperatorInterater_Make((CStr[]){ "obj",NULL },OperatorDefineMap_Make((OperatorDefiner[]){
-                OperatorDefiner_New(TOKEN_LUALIKE_ASD,(Token(*)(void*,Token*,Vector*))List_Obj_Handler_Asd),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASD,(Token(*)(void*,Token*,Vector*))List_Obj_Handler_Asd),
                 OPERATORDEFINER_END
             })),
             OPERATORINTERATER_END

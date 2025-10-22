@@ -138,7 +138,7 @@ Token VBCell_Float_Handler_Ass(Excel* e,Token* op,Vector* args){
     ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
 
     if(vbcell_a->output) free(vbcell_a->output);
-    CStr_Set(&vbcell_a->type,"int");
+    CStr_Set(&vbcell_a->type,"float");
     vbcell_a->output = malloc(sizeof(Double));
     *(Double*)vbcell_a->output = Excel_Float_Get(e,b);
 
