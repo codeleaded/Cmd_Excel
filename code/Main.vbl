@@ -1,4 +1,4 @@
-from vbcell import *
+from math import *
 
 function add(a,b)
     return a + b
@@ -6,15 +6,9 @@ end
 
 function main()
     
-    $(0,0) = 1
-    $(1,0) = 2
-
-    $(2,0) = $(0,0) + $(1,0)
-    $(3,0) = add($(0,0) + $(0,0),$(1,0) + $(1,0))
-    
     i = 0
     while i<5
-        $(i,i) = "Index: " + i
+        $(i,i) = i + i
         i = i + 1
     end
     

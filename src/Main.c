@@ -33,7 +33,7 @@ int main(int argc,const char *argv[]){
     Excel_Print_T(&e);
     Excel_Print_O(&e);
 
-    //Excel_Save(&e,"./data/SpreadSheet0.vblss");
+    Excel_Save(&e,"./data/SpreadSheet0.vblss");
 
     Excel_Free(&e);
 
