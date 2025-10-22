@@ -1,23 +1,23 @@
 #include "/home/codeleaded/System/Static/Library/AlxCallStack.h"
 #include "/home/codeleaded/System/Static/Library/AlxExternFunctions.h"
-#include "/home/codeleaded/System/Static/Library/LuaLikeDefines.h"
 #include "/home/codeleaded/System/Static/Library/Thread.h"
+#include "/home/codeleaded/System/Static/Library/Excel.h"
 
-Variable sys_msleep(Scope* sc,CStr name,Variable* args){
+Variable sys_msleep(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     
     Number duration = *(Number*)a->data;
     Thread_Sleep_M(duration);
     return Variable_Null();
 }
-Variable sys_usleep(Scope* sc,CStr name,Variable* args){
+Variable sys_usleep(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     
     Number duration = *(Number*)a->data;
     Thread_Sleep_U(duration);
     return Variable_Null();
 }
-Variable sys_nsleep(Scope* sc,CStr name,Variable* args){
+Variable sys_nsleep(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     
     Number duration = *(Number*)a->data;

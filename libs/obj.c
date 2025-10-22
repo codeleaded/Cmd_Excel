@@ -1,7 +1,6 @@
 #include "/home/codeleaded/System/Static/Library/AlxCallStack.h"
 #include "/home/codeleaded/System/Static/Library/AlxExternFunctions.h"
-#include "/home/codeleaded/System/Static/Library/AlxInterpreter.h"
-#include "/home/codeleaded/System/Static/Library/LuaLikeDefines.h"
+#include "/home/codeleaded/System/Static/Library/Excel.h"
 
 typedef VariableMap Object;// Vector<Variable>
 
@@ -16,7 +15,7 @@ void Obj_Cpyer(Variable* src,Variable* dst){
     *dst_str = VariableMap_Cpy(src_str);
 }
 
-Token Obj_Obj_Handler_Ass(Scope* s,Token* op,Vector* args){
+Token Obj_Obj_Handler_Ass(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
@@ -24,7 +23,7 @@ Token Obj_Obj_Handler_Ass(Scope* s,Token* op,Vector* args){
 
     Variable* b_var;
     if(b->tt==TOKEN_STRING){
-        b_var = Scope_FindVariable(s,b->str);
+        b_var = Scope_FindVariable(&e->vbl.ev.sc,b->str);
         if(!b_var){
             printf("[Obj_Ass]: 1. Arg: Variable %s doesn't exist!\n",a->str);
             return Token_Null();
@@ -35,10 +34,10 @@ Token Obj_Obj_Handler_Ass(Scope* s,Token* op,Vector* args){
     }
     
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(!a_var){
-            Scope_BuildVariableRange(s,a->str,"obj",s->range-1);
-            a_var = Scope_FindVariable(s,a->str);
+            Scope_BuildVariableRange(&e->vbl.ev.sc,a->str,"obj",e->vbl.ev.sc.range-1);
+            a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
             if(a_var->data) free(a_var->data);
             a_var->data = NULL;
         }
@@ -51,7 +50,7 @@ Token Obj_Obj_Handler_Ass(Scope* s,Token* op,Vector* args){
 
     return Token_Null();
 }
-Token Obj_Any_Handler_Acs(Scope* s,Token* op,Vector* args){
+Token Obj_Any_Handler_Acs(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
@@ -59,7 +58,7 @@ Token Obj_Any_Handler_Acs(Scope* s,Token* op,Vector* args){
     
     CStr name = NULL;
     if(a->tt==TOKEN_STRING){
-        Variable* a_var = Scope_FindVariable(s,a->str);
+        Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(a_var){
             if(!Variable_Data(a_var)){
                 printf("[Obj_Acs]: 1. Arg: %s is not a init obj type!\n",a->str);
@@ -74,7 +73,7 @@ Token Obj_Any_Handler_Acs(Scope* s,Token* op,Vector* args){
                 }
 
                 String strbuilder = String_Make(".OBJACS");
-                Variable* temp = Scope_FindVariableLike(s,".OBJACS*",'*');
+                Variable* temp = Scope_FindVariableLike(&e->vbl.ev.sc,".OBJACS*",'*');
                 
                 if(temp){
                     CStr retnumberstr = temp->name + 7;// CStr_Size(".OBJACS") -> 7
@@ -87,7 +86,7 @@ Token Obj_Any_Handler_Acs(Scope* s,Token* op,Vector* args){
                     name = CStr_Cpy(".OBJACS0");
                 }
 
-                Scope_BuildRefVariableRange(s,name,member->typename,s->range,member);
+                Scope_BuildRefVariableRange(&e->vbl.ev.sc,name,member->typename,e->vbl.ev.sc.range,member);
             }
         }else{
             printf("[Obj_Ass]: 1. Arg: %s is not a variable!\n",a->str);
@@ -100,14 +99,14 @@ Token Obj_Any_Handler_Acs(Scope* s,Token* op,Vector* args){
 
     return Token_Move(TOKEN_STRING,name);
 }
-Token Obj_Handler_Cast(Scope* s,Token* op,Vector* args){
+Token Obj_Handler_Cast(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
 
     //printf("CAST: %s\n",a->str);
 
     Variable* a_var;
     if(a->tt==TOKEN_STRING){
-        a_var = Scope_FindVariable(s,a->str);
+        a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
         if(!a_var){
             printf("[Obj_Ass]: 1. Arg: Variable %s doesn't exist!\n",a->str);
             return Token_Null();
@@ -128,7 +127,7 @@ Token Obj_Handler_Cast(Scope* s,Token* op,Vector* args){
         
         String_Append(&builder," = ");
 
-        CStr content = Scope_VariableContentStr(s,v);
+        CStr content = Scope_VariableContentStr(&e->vbl.ev.sc,v);
         if(content){
             String_Append(&builder,content);
             CStr_Free(&content);
@@ -143,12 +142,12 @@ Token Obj_Handler_Cast(Scope* s,Token* op,Vector* args){
     String_Free(&builder);
     return Token_Move(TOKEN_CONSTSTRING_DOUBLE,resstr);
 }
-Token Obj_Handler_Destroy(Scope* s,Token* op,Vector* args){
+Token Obj_Handler_Destroy(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
 
     //printf("DESTROY: %s\n",a->str);
 
-    Variable* a_var = Scope_FindVariable(s,a->str);
+    Variable* a_var = Scope_FindVariable(&e->vbl.ev.sc,a->str);
     if(a_var){
         a_var->destroy(a_var);
     }
@@ -187,11 +186,11 @@ void Ex_Packer(ExternFunctionMap* Extern_Functions,Vector* funcs,Scope* s){//Vec
                 OPERATORDEFINER_END
             })),
             OperatorInterater_Make((CStr[]){ "obj",NULL },OperatorDefineMap_Make((OperatorDefiner[]){
-                OperatorDefiner_New(TOKEN_LUALIKE_ASS,(Token(*)(void*,Token*,Vector*))Obj_Obj_Handler_Ass),
+                OperatorDefiner_New(TOKEN_VBLIKE_ASS,(Token(*)(void*,Token*,Vector*))Obj_Obj_Handler_Ass),
                 OPERATORDEFINER_END
             })),
             OperatorInterater_Make((CStr[]){ OPERATORINTERATER_DONTCARE,NULL },OperatorDefineMap_Make((OperatorDefiner[]){
-                OperatorDefiner_New(TOKEN_LUALIKE_ACS,(Token(*)(void*,Token*,Vector*))Obj_Any_Handler_Acs),
+                OperatorDefiner_New(TOKEN_VBLIKE_ACS,(Token(*)(void*,Token*,Vector*))Obj_Any_Handler_Acs),
                 OPERATORDEFINER_END
             })),
             OPERATORINTERATER_END
