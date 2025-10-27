@@ -185,24 +185,14 @@ Token VBCell_Bool_Handler_Ass(Excel* e,Token* op,Vector* args){
 
     printf("ASS: %s = %s\n",a->str,b->str);
 
-    //const Vic2 pos = VBLike_ExtractCoords(&e->vbl,a);
     ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
 
     if(vbcell_a->output) free(vbcell_a->output);
     CStr_Set(&vbcell_a->type,"bool");
-    
-    vbcell_a->output = malloc(sizeof(CStr));
-    *(CStr*)vbcell_a->output = CStr_Cpy(Excel_Bool_Get(e,b));
+    vbcell_a->output = malloc(sizeof(Boolean));
+    *(Boolean*)vbcell_a->output = Excel_Bool_Get(e,b);
 
     return Token_Cpy(a);
-}
-Token VBCell_Bool_Handler_Add(Excel* e,Token* op,Vector* args){
-    Token* a = (Token*)Vector_Get(args,0);
-    Token* b = (Token*)Vector_Get(args,1);
-
-    printf("ADD: %s + %s\n",a->str,b->str);
-    
-    return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Concat(Excel_Bool_Get(e,a),Excel_Bool_Get(e,b)));
 }
 
 Token VBCell_Handler_Cast(Excel* e,Token* op,Vector* args){
@@ -303,7 +293,6 @@ void Ex_Packer(ExternFunctionMap* Extern_Functions,Vector* funcs,Scope* s){//Vec
             })),
             OperatorInterater_Make((CStr[]){ "bool",NULL },OperatorDefineMap_Make((OperatorDefiner[]){
                 OperatorDefiner_New(TOKEN_VBLIKE_ASS,(Token(*)(void*,Token*,Vector*))VBCell_Bool_Handler_Ass),
-                OperatorDefiner_New(TOKEN_VBLIKE_ADD,(Token(*)(void*,Token*,Vector*))VBCell_Bool_Handler_Add),
                 OPERATORDEFINER_END
             })),
             OPERATORINTERATER_END
