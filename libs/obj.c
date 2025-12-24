@@ -171,7 +171,7 @@ Variable Obj_new(Scope* sc,CStr name,Variable* args){
         );
         return ret;
     }else{
-        Interpreter_ErrorHandler((Enviroment*)sc,"obj::new expected a valid type name!");
+        Interpreter_ErrorHandler((Environment*)sc,"obj::new expected a valid type name!");
         return Variable_Null();
     }
 }

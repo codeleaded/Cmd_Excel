@@ -83,7 +83,7 @@ Token Int_Any_Handler_Div(Excel* e,Token* op,Vector* args){
     Number res = 0;
     if(n2!=0) res = n1 / n2;
     else{
-        printf("[Enviroment]: Error: DIV by Zero\n");
+        printf("[Environment]: Error: DIV by Zero\n");
     }
 
     char* resstr = Number_Get(res);
