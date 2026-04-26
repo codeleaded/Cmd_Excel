@@ -1,193 +1,121 @@
-# Cmd_Excel
+# Project README
 
+## Overview
+Cmd_Excel is a multi-language programming environment designed to support various functionalities such as mathematical operations, input/output, system calls, and basic threading. The project includes a set of libraries and tools that allow users to write scripts in different languages.
 
-## Project Overview
+## Features
+- **Mathematical Operations**: Supports basic arithmetic operations.
+- **Input/Output**: Functions for reading from and writing to the console.
+- **System Calls**: Support for basic system calls such as sleeping.
+- **Basic Threading**: Provides functions for basic threading operations.
+- **Custom Languages**: Allows users to write scripts in custom languages like .rex, .ll, and .omml.
 
-This project implements specialized functionality related to excel.
-
-## Core Components
-
-### Main Functionality
-- Implements core algorithms for excel
-- Efficient data structures
-- Optimized performance
-- Clean code organization
-
-### Technical Features
-- C/C++ implementation
-- Dynamic memory management
-- Platform-independent design
-- Real-time capable
-
-### Architecture
-- Module separation
-- Clear interface design
-- Proper abstraction layers
-- Extensible design
-
-## Use Cases
-- Production systems
-- Educational purposes
-- Research applications
-- Performance-critical operations
-
-## Performance Characteristics
-- Optimized algorithms
-- Efficient memory usage
-- Scalable architecture
-- Minimal overhead
-
-## Implementation Quality
-- Well-organized code
-- Meaningful naming
-- Proper error handling
-- Memory management
-
-## Build and Deployment
-- Standard C/C++ compilation
-- Makefile-based building
-- Cross-platform support
-- Easy integration
-
-
-## Building the Project
-
-### Prerequisites
-- C/C++ Compiler (GCC, Clang, or MSVC)
-- Make utility
-- Standard development tools
-
-### Build Steps
-
-1. Navigate to project directory:
-```bash
-cd Cmd_Excel
-```
-
-2. Build the project:
-```bash
-make -f Makefile.(os) all
-```
-
-3. For clean rebuild:
-```bash
-make -f Makefile.(os) clean
-make -f Makefile.(os) all
-```
-
-4. If there are ./bin and ./libs directories, build libs with:
-```bash
-make -f Makefile.(os) cleanlib
-make -f Makefile.(os) lib
-```
-
-### Build Options
-```bash
-make -f Makefile.(os) all         # build output
-make -f Makefile.(os) do        # build + exe output
-make -f Makefile.(os) clean   # Remove build artifacts
-```
-
-## Running the Project
-
-Execute the compiled binary:
-
-```bash
-./build/Main(.exe)
-```
-
-Or using make:
-```bash
-make -f Makefile.(os) exe
-```
-
-## Project Organization
-
+## Project Structure
 ```
 Cmd_Excel/
-├── src/
+├── build/              # Compiled output (.exe files)
+├── bin/                # Shared libraries (.so or .dll)
+├── libs/               # Source files for the shared libraries
+├── lib/                # Custom library support
+├── code/               # Scripts in custom languages
+├── data/               # Data files (e.g., .txt, dumped files)
+├── assets/             # Images and sound files
+├── src/                # Source code including Main.c
 │   ├── Main.c          # Entry point
-│   └── *.c             # Implementation files
-├── Makefile            # Build configuration
+│   └── *.h             # Standalone header-based C-files
+├── Makefile.linux      # Linux build configuration
+├── Makefile.windows    # Windows build configuration
+├── Makefile.wine       # Wine build configuration for Windows cross-compilation
+├── Makefile.web        # Emscripten build configuration for WebAssembly
 └── README.md           # This file
 ```
 
-## Technical Details
+### Prerequisites
+- **C/C++ Compiler and Debugger**: GCC, Clang
+- **Make Utility**
+- **Standard Development Tools**
+- **Libraries Needed**: Depending on the target platform (Windows, Linux), specific libraries might be required.
 
-### Language: C/C++
-- Performance-oriented
-- Direct hardware access where needed
-- Memory efficient
-- Widely portable
+## Build & Run
+The project uses Makefiles to manage builds across different platforms. Below are the commands for building and running the project:
 
-### Key Technologies
-- Standard C library
-- System-specific libraries as needed
-- Algorithm optimization
-- Efficient data structures
+### Build Process
 
-### Code Quality
-- Clean, readable implementation
-- Proper error handling
-- Resource management
-- Well-documented algorithms
+#### Linux
+```sh
+cd Cmd_Excel
+make -f Makefile.linux all
+```
 
-## Development Notes
+For a clean build:
+```sh
+make -f Makefile.linux clean
+make -f Makefile.linux all
+```
 
-### Architecture Decisions
-- Modular design for reusability
-- Efficient algorithms for performance
-- Clear separation of concerns
-- Extensible structure
+To build libraries specifically:
+```sh
+make -f Makefile.linux cleanlib
+make -f Makefile.linux lib
+```
 
-### Performance Optimizations
-- Algorithm efficiency
-- Memory layout optimization
-- Cache-conscious programming
-- Minimal overhead
+#### Windows
+```sh
+cd Cmd_Excel
+make -f Makefile.windows all
+```
 
-### Portability
-- Cross-platform compatible
-- Platform-specific optimizations where possible
-- Standard library usage
-- No external dependencies (where feasible)
+For a clean build:
+```sh
+make -f Makefile.windows clean
+make -f Makefile.windows all
+```
 
-## Troubleshooting
+#### Wine (Cross-compiling for Windows)
+```sh
+cd Cmd_Excel
+make -f Makefile.wine all
+```
 
-### Build Issues
-- Ensure compiler is installed
-- Check file paths and permissions
-- Verify Make installation
-- Review compiler error messages
+For a clean build:
+```sh
+make -f Makefile.wine clean
+make -f Makefile.wine all
+```
 
-### Runtime Issues
-- Check input data validity
-- Verify file accessibility
-- Ensure sufficient memory
-- Review output format
+#### WebAssembly (Emscripten)
+```sh
+cd Cmd_Excel
+make -f Makefile.web all
+```
 
-### Performance Issues
-- Check compiler optimization flags
-- Profile hot code paths
-- Review algorithm complexity
-- Consider input size
+For a clean build:
+```sh
+make -f Makefile.web clean
+make -f Makefile.web all
+```
 
-## Future Improvements
+### Execution
+To run the compiled executable, use `make` with the appropriate target:
 
-Potential enhancements:
-- Additional optimization opportunities
-- Extended functionality
-- Platform-specific optimizations
-- Performance profiling
+#### Linux
+```sh
+make -f Makefile.linux exe
+```
 
-## References
+#### Windows (assuming the output is a .dll or .exe)
+```sh
+make -f Makefile.windows exe
+```
 
-For technical background:
-- Algorithm textbooks
-- Computer science references
-- Language documentation
-- Online educational resources
+#### Wine
+```sh
+make -f Makefile.wine exe
+```
 
----
+#### WebAssembly
+```sh
+make -f Makefile.web exe
+```
 
-*Project implementing practical algorithms and data structures in C/C++*
+The `README.md` file and `LICENCE` are also included in the project structure.
