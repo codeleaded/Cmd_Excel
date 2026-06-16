@@ -18,7 +18,7 @@ Token VBCell_VBCell_Handler_Ass(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ASS: %s = %s\n",a->str,b->str);
+    //printf("ASS: %s = %s\n",a->str,b->str);
 
     ExcelCell* ec = Excel_VBCell_Get(e,a);
 
@@ -83,7 +83,7 @@ Token VBCell_VBCell_Handler_Add(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ADD: %s + %s\n",a->str,b->str);
+    //printf("ADD: %s + %s\n",a->str,b->str);
 
     ExcelCell* ec = Excel_VBCell_Get(e,a);
 
@@ -107,7 +107,7 @@ Token VBCell_Int_Handler_Ass(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ASS: %s = %ld\n",a->str,b->v_i64);
+    //printf("ASS: %s = %ld\n",a->str,b->v_i64);
 
     //const Vic2 pos = VBLike_ExtractCoords(&e->vbl,a);
     ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
@@ -123,7 +123,7 @@ Token VBCell_Int_Handler_Add(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ADD: %s + %ld\n",a->str,b->v_i64);
+    //printf("ADD: %s + %ld\n",a->str,b->v_i64);
     
     return Token_New_I64(TOKEN_NUMBER,Excel_Int_Get(e,a) + Excel_Int_Get(e,b));
 }
@@ -132,7 +132,7 @@ Token VBCell_Float_Handler_Ass(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ASS: %s = %lf\n",a->str,b->v_f64);
+    //printf("ASS: %s = %lf\n",a->str,b->v_f64);
 
     //const Vic2 pos = VBLike_ExtractCoords(&e->vbl,a);
     ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
@@ -148,7 +148,7 @@ Token VBCell_Float_Handler_Add(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ADD: %s + %lf\n",a->str,b->v_f64);
+    //printf("ADD: %s + %lf\n",a->str,b->v_f64);
     
     return Token_New_F64(TOKEN_FLOAT,Excel_Float_Get(e,a) + Excel_Float_Get(e,b));
 }
@@ -157,7 +157,7 @@ Token VBCell_Str_Handler_Ass(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ASS: %s = %s\n",a->str,b->str);
+    //printf("ASS: %s = %s\n",a->str,b->str);
 
     //const Vic2 pos = VBLike_ExtractCoords(&e->vbl,a);
     ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
@@ -174,7 +174,7 @@ Token VBCell_Str_Handler_Add(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ADD: %s + %s\n",a->str,b->str);
+    //printf("ADD: %s + %s\n",a->str,b->str);
     
     return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Concat(Excel_Str_Get(e,a),Excel_Str_Get(e,b)));
 }
@@ -183,7 +183,7 @@ Token VBCell_Bool_Handler_Ass(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ASS: %s = %d\n",a->str,b->v_b1);
+    //printf("ASS: %s = %d\n",a->str,b->v_b1);
 
     ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
 
@@ -205,17 +205,63 @@ Token VBCell_Handler_Cast(Excel* e,Token* op,Vector* args){
 
 Variable VBCell_CellGet(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
-    Variable* b = &args[1];
+    ExcelCell* ec = Excel_VBCell_Get_V(e,a);
+
+    if(ec){
+        if(CStr_Cmp(ec->type,"int")){
+            return Variable_Make(
+                "OUT",
+                "int",
+                (Number[]){ *(Number*)ec->output },
+                sizeof(Number),
+                0,
+                NULL,
+                NULL
+            );
+        }else if(CStr_Cmp(ec->type,"float")){
+            return Variable_Make(
+                "OUT",
+                "float",
+                (Double[]){ *(Double*)ec->output },
+                sizeof(Double),
+                0,
+                NULL,
+                NULL
+            );
+        }else if(CStr_Cmp(ec->type,"bool")){
+            return Variable_Make(
+                "OUT",
+                "bool",
+                (Boolean[]){ *(Boolean*)ec->output },
+                sizeof(Boolean),
+                0,
+                NULL,
+                NULL
+            );
+        }else if(CStr_Cmp(ec->type,"str")){
+            return Variable_Make(
+                "OUT",
+                "str",
+                (CStr[]){ *(CStr*)ec->output },
+                sizeof(CStr),
+                0,
+                NULL,
+                NULL
+            );
+        }else if(CStr_Cmp(ec->type,"func")){
+            return Variable_Make(
+                "OUT",
+                "func",
+                (CStr[]){ *(CStr*)ec->output },
+                sizeof(CStr),
+                0,
+                NULL,
+                NULL
+            );
+        }
+    }
     
-    return Variable_Make(
-        "OUT",
-        "vbcell",
-        (CStr[]){ CStr_Format("%d,%d",*(Number*)a->data,*(Number*)b->data) },
-        sizeof(CStr),
-        0,
-        NULL,
-        NULL
-    );
+    return Variable_Null();
 }
 Variable VBCell_CellSet(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
@@ -259,6 +305,20 @@ Variable VBCell_CellSet(Excel* e,CStr name,Variable* args){
     
     return Variable_Null();
 }
+Variable VBCell_CellAcs(Excel* e,CStr name,Variable* args){
+    Variable* a = &args[0];
+    Variable* b = &args[1];
+    
+    return Variable_Make(
+        "OUT",
+        "vbcell",
+        (CStr[]){ CStr_Format("%d,%d",*(Number*)a->data,*(Number*)b->data) },
+        sizeof(CStr),
+        0,
+        NULL,
+        NULL
+    );
+}
 
 void Ex_Packer(ExternFunctionMap* Extern_Functions,Vector* funcs,Scope* s){//Vector<CStr>
     TypeMap_PushContained(&s->types,funcs,
@@ -295,7 +355,7 @@ void Ex_Packer(ExternFunctionMap* Extern_Functions,Vector* funcs,Scope* s){//Vec
         }),NULL,NULL)
     );
     ExternFunctionMap_PushContained_C(Extern_Functions,funcs,(ExternFunction[]){
-        ExternFunction_New("get","vbcell",(Member[]){ 
+        ExternFunction_New("get",NULL,(Member[]){ 
             Member_New("int","x"),
             Member_New("int","y"),
             MEMBER_END
@@ -306,6 +366,11 @@ void Ex_Packer(ExternFunctionMap* Extern_Functions,Vector* funcs,Scope* s){//Vec
             Member_New(NULL,"content"),
             MEMBER_END
         },(void*)VBCell_CellSet),
+        ExternFunction_New("acs","vbcell",(Member[]){ 
+            Member_New("int","x"),
+            Member_New("int","y"),
+            MEMBER_END
+        },(void*)VBCell_CellAcs),
         ExternFunction_Null()
     });
 }

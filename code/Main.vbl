@@ -2,12 +2,18 @@ from math import *
 from io import *
 
 function main()
-    a = math::sin(3.141592654 * 0.5)
-    io::print("A: " + math::getFloat(a) + "\n")
+    i = 0
+    while i < 5
+        $(i,0) = i
+        i = i + 1
+    end
 
-    $(0,0) = 1.0
-    $(1,0) = 2.0
-    $(0,1) = 3.0
-    $(1,1) = 4.0
-    return a
+    i = 0
+    while i < 5
+        $(i,1) = $(i,0) + 1
+        --io::print("A: " + math::getInt(a) + "\n")
+        i = i + 1
+    end
+
+    return
 end
