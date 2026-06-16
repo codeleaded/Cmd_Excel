@@ -89,9 +89,9 @@ Token VBCell_VBCell_Handler_Add(Excel* e,Token* op,Vector* args){
 
     if(ec){
         if(CStr_Cmp(ec->type,"int")){
-            return Token_Move(TOKEN_NUMBER,I64_Get_D(Excel_Int_Get(e,a) + Excel_Int_Get(e,b)));
+            return Token_New_I64(TOKEN_NUMBER,Excel_Int_Get(e,a) + Excel_Int_Get(e,b));
         }else if(CStr_Cmp(ec->type,"float")){
-            return Token_Move(TOKEN_FLOAT,F64_Get_Dc(Excel_Float_Get(e,a) + Excel_Float_Get(e,b)));
+            return Token_New_F64(TOKEN_FLOAT,Excel_Float_Get(e,a) + Excel_Float_Get(e,b));
         }else if(CStr_Cmp(ec->type,"str")){
             return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Concat(Excel_Str_Get(e,a),Excel_Str_Get(e,b)));
         }else if(!ec->type){
@@ -107,7 +107,7 @@ Token VBCell_Int_Handler_Ass(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ASS: %s = %s\n",a->str,b->str);
+    printf("ASS: %s = %ld\n",a->str,b->v_i64);
 
     //const Vic2 pos = VBLike_ExtractCoords(&e->vbl,a);
     ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
@@ -123,16 +123,16 @@ Token VBCell_Int_Handler_Add(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ADD: %s + %s\n",a->str,b->str);
+    printf("ADD: %s + %ld\n",a->str,b->v_i64);
     
-    return Token_Move(TOKEN_NUMBER,I64_Get_D(Excel_Int_Get(e,a) + Excel_Int_Get(e,b)));
+    return Token_New_I64(TOKEN_NUMBER,Excel_Int_Get(e,a) + Excel_Int_Get(e,b));
 }
 
 Token VBCell_Float_Handler_Ass(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ASS: %s = %s\n",a->str,b->str);
+    printf("ASS: %s = %lf\n",a->str,b->v_f64);
 
     //const Vic2 pos = VBLike_ExtractCoords(&e->vbl,a);
     ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
@@ -148,9 +148,9 @@ Token VBCell_Float_Handler_Add(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ADD: %s + %s\n",a->str,b->str);
+    printf("ADD: %s + %lf\n",a->str,b->v_f64);
     
-    return Token_Move(TOKEN_FLOAT,F64_Get_Dc(Excel_Float_Get(e,a) + Excel_Float_Get(e,b)));
+    return Token_New_F64(TOKEN_FLOAT,Excel_Float_Get(e,a) + Excel_Float_Get(e,b));
 }
 
 Token VBCell_Str_Handler_Ass(Excel* e,Token* op,Vector* args){
@@ -183,7 +183,7 @@ Token VBCell_Bool_Handler_Ass(Excel* e,Token* op,Vector* args){
     Token* a = (Token*)Vector_Get(args,0);
     Token* b = (Token*)Vector_Get(args,1);
 
-    printf("ASS: %s = %s\n",a->str,b->str);
+    printf("ASS: %s = %d\n",a->str,b->v_b1);
 
     ExcelCell* vbcell_a = Excel_VBCell_Get(e,a);
 
@@ -200,7 +200,6 @@ Token VBCell_Handler_Cast(Excel* e,Token* op,Vector* args){
 
     //ExcelCell* ec = Excel_VBCell_Get(e,a);
     const Vic2 pos = VBLike_ExtractCoords(&e->vbl,a);
-    
     return Token_Move(TOKEN_CONSTSTRING_DOUBLE,CStr_Format("$(%d,%d)",pos.x,pos.y));
 }
 
@@ -211,7 +210,7 @@ Variable VBCell_CellGet(Excel* e,CStr name,Variable* args){
     return Variable_Make(
         "OUT",
         "vbcell",
-        (CStr[]){ CStr_Format("%ld,%ld",*(Number*)a->data,*(Number*)b->data) },
+        (CStr[]){ CStr_Format("%d,%d",*(Number*)a->data,*(Number*)b->data) },
         sizeof(CStr),
         0,
         NULL,
@@ -222,10 +221,7 @@ Variable VBCell_CellSet(Excel* e,CStr name,Variable* args){
     Variable* a = &args[0];
     Variable* b = &args[1];
     Variable* c = &args[2];
-
-    Token tok = Token_Move(TOKEN_VBLIKE_CELL,CStr_Format("%d,%d",*(Number*)a->data,*(Number*)b->data));
-    ExcelCell* ec = Excel_VBCell_Get(e,&tok);
-    Token_Free(&tok);
+    ExcelCell* ec = Excel_VBCell_Get_C(e,(Vic2){ *(Number*)Variable_Data(a),*(Number*)Variable_Data(b) });
 
     if(CStr_Cmp(c->typename,"int")){
         if(ec->output) free(ec->output);

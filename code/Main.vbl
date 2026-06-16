@@ -1,12 +1,13 @@
 from math import *
-
-function add(a,b)
-    return a + b
-end
+from io import *
 
 function main()
-    
-    $(0,0) = math::sin(3.1415 * 0.5)
-    
-    return
+    a = math::sin(3.141592654 * 0.5)
+    io::print("A: " + math::getFloat(a) + "\n")
+
+    $(0,0) = 1.0
+    $(1,0) = 2.0
+    $(0,1) = 3.0
+    $(1,1) = 4.0
+    return a
 end

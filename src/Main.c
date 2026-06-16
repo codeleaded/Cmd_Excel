@@ -27,6 +27,8 @@ int main(int argc,const char *argv[]){
     Variable ret = Excel_Function(&e.vbl.ev,"main",(Variable[]){
        Variable_Null()
     });
+    Variable_Print(&ret);
+    printf("\n");
     Variable_Free(&ret);
     
     Excel_Print(&e);
